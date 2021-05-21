@@ -45,4 +45,4 @@ def handleMessage(msg):
         send('Guest #' + str(session['guest_id']) + ': ' + msg, broadcast=True)
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True)
+    socketio.run(app)
