@@ -8,15 +8,13 @@ app.config['SECRET_KEY'] = 'mysecret'
 socketio = SocketIO(app)
 
 @app.before_request
-def before_request():
+def before_request(response):
     random_num = random.randint(0, 10000)
     session['guest_id'] = random_num
-
-@app.after_request # blueprint can also be app~~
-def after_request(response):
     header = response.headers
     header['Access-Control-Allow-Origin'] = '*'
     return response
+
     
 @app.route('/')
 def home():
