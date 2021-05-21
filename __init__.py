@@ -1,11 +1,9 @@
 from flask import Flask, render_template, render_template_string, request, session
 from flask_socketio import SocketIO, send
 import random
-from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
-cors = CORS(app)
-app.config['CORS_HEADERS'] = 'Content-Type'
+
 app.config['SECRET_KEY'] = 'mysecret'
 socketio = SocketIO(app)
 
@@ -14,6 +12,12 @@ def before_request():
     random_num = random.randint(0, 10000)
     session['guest_id'] = random_num
 
+@app.after_request # blueprint can also be app~~
+def after_request(response):
+    header = response.headers
+    header['Access-Control-Allow-Origin'] = '*'
+    return response
+    
 @app.route('/')
 def home():
     return render_template('home.html')
@@ -38,7 +42,6 @@ def index():
     return render_template_string(template)
 
 @app.route('/chat')
-@cross_origin()
 def chat():
     return render_template('chat.html')
 
