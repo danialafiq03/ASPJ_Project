@@ -1,7 +1,11 @@
 from flask import Flask, render_template, render_template_string, request, session
 from flask_socketio import SocketIO, send
 import random
+from flask_cors import CORS, cross_origin
+
 app = Flask(__name__)
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 app.config['SECRET_KEY'] = 'mysecret'
 socketio = SocketIO(app)
 
@@ -34,6 +38,7 @@ def index():
     return render_template_string(template)
 
 @app.route('/chat')
+@cross_origin()
 def chat():
     return render_template('chat.html')
 
