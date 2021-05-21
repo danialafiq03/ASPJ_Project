@@ -8,13 +8,9 @@ app.config['SECRET_KEY'] = 'mysecret'
 socketio = SocketIO(app)
 
 @app.before_request
-def before_request(response):
+def before_request():
     random_num = random.randint(0, 10000)
     session['guest_id'] = random_num
-    header = response.headers
-    header['Access-Control-Allow-Origin'] = '*'
-    return response
-
     
 @app.route('/')
 def home():
