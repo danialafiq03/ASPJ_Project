@@ -15,7 +15,7 @@
 <body>
     <script type="text/javascript">
         $(document).ready(function() {
-            var socket = io.connect('https://aspjproject.herokuapp.com/');
+            var socket = io.connect('https://aspjproject.herokuapp.com:$PORT/');
 
             user = 'Guest #{{ session['guest_id'] }}'
 
