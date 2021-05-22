@@ -37,6 +37,8 @@ def index():
 
 @app.route('/chat')
 def chat():
+    response = Response()
+    response.headers["Access-Control-Allow-Origin"] = "*"
     return render_template('chat.html')
 
 @socketio.on('message')
