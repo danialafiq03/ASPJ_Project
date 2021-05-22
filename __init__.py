@@ -1,4 +1,4 @@
-from flask import Flask, render_template, render_template_string, request, session
+from flask import Flask, render_template, render_template_string, request, session, Response
 from flask_socketio import SocketIO, send
 import random
 
@@ -37,7 +37,9 @@ def index():
 
 @app.route('/chat')
 def chat():
-    return render_template('chat.html')
+    response = Response()
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    return response, render_template('chat.html')
 
 @socketio.on('message')
 def handleMessage(msg):
