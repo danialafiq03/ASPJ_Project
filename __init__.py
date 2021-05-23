@@ -1,6 +1,8 @@
-from flask import Flask, render_template, render_template_string, request
+from flask import Flask, render_template, render_template_string, request, make_response, redirect, url_for, session
 
 app = Flask(__name__)
+app.secret_key = 'secret-key'
+
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
@@ -10,15 +12,25 @@ def home():
         email = request.form['email']
         return email
 
-@app.route('/login')
+@app.route('/login', methods=['POST', 'GET'])
 def login():
-    return render_template('login.html')
+    if request.method == "POST":
+        email = request.form["email"]
+        session["email"] = email
+        return redirect(url_for("welcome"))
 
-@app.route('/welcome', methods=['POST'])
-def welcome():
-    email = request.form['email']
-    return render_template('welcome.html', email=email)
+        # response = make_response(redirect(url_for("getcookie")))
+        # response.set_cookie("email", email)
+        # return response
+    else:
+        if "email" in session:
+            return redirect(url_for('welcome'))
+        return render_template('login.html')
 
+@app.route('/logout')
+def logout():
+    session.pop("email", None)
+    return redirect(url_for("login"))
 
 @app.route('/register')
 def register():
@@ -29,11 +41,17 @@ def index():
     search = request.args.get('search')
 
     template = '''
-        <p>Hello World</p>
         {}
     '''.format(search)
-
     return render_template_string(template)
+
+@app.route('/welcome')
+def welcome():
+   email = session["email"]
+   if email:
+       return render_template("welcome.html", email=email)
+   else:
+       return redirect(url_for("login"))
 
 if __name__ == '__main__':
     app.run(debug=True)
