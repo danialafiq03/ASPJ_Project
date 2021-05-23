@@ -2,13 +2,23 @@ from flask import Flask, render_template, render_template_string, request
 
 app = Flask(__name__)
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def home():
-    return render_template('home.html')
+    if request.method == 'GET':
+        return render_template('home.html')
+    else:
+        email = request.form['email']
+        return email
 
 @app.route('/login')
 def login():
     return render_template('login.html')
+
+@app.route('/welcome', methods=['POST'])
+def welcome():
+    email = request.form['email']
+    return render_template('welcome.html', email=email)
+
 
 @app.route('/register')
 def register():
