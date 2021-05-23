@@ -1,8 +1,11 @@
-from flask import Flask, render_template, render_template_string, request, make_response, redirect, url_for, session
+from flask import Flask, render_template, render_template_string, request, make_response, redirect, url_for
+import os
+import pickle
+from base64 import b64encode, b64decode
+from User import User
 
 app = Flask(__name__)
 app.secret_key = 'secret-key'
-
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
@@ -16,21 +19,21 @@ def home():
 def login():
     if request.method == "POST":
         email = request.form["email"]
-        session["email"] = email
-        return redirect(url_for("welcome"))
-
-        # response = make_response(redirect(url_for("getcookie")))
-        # response.set_cookie("email", email)
-        # return response
+        user_obj = User(email)
+        response = make_response(redirect(url_for("welcome")))
+        response.set_cookie("uid", b64encode(pickle.dumps(user_obj)))
+        return response
     else:
-        if "email" in session:
-            return redirect(url_for('welcome'))
+        if "uid" in request.cookies:
+            return redirect(url_for("welcome"))
         return render_template('login.html')
 
 @app.route('/logout')
 def logout():
-    session.pop("email", None)
-    return redirect(url_for("login"))
+    # session.pop("email", None)
+    response = make_response(redirect(url_for('login')))
+    response.delete_cookie("uid")
+    return response
 
 @app.route('/register')
 def register():
@@ -45,13 +48,23 @@ def index():
     '''.format(search)
     return render_template_string(template)
 
+
 @app.route('/welcome')
 def welcome():
-   email = session["email"]
-   if email:
-       return render_template("welcome.html", email=email)
-   else:
-       return redirect(url_for("login"))
+    user_obj = request.cookies.get("uid")
+    if user_obj:
+        return "Hey there! {}" .format(pickle.loads(b64decode(user_obj)))
+    else:
+        return redirect(url_for("login"))
+
+# @app.route('/welcome')
+# def welcome():
+#     email = session["email"]
+#     if email:
+#         return render_template("welcome.html", email=email)
+#     else:
+#         return redirect(url_for("login"))
+
 
 if __name__ == '__main__':
     app.run(debug=True)
