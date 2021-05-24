@@ -3,9 +3,11 @@ import os
 import pickle
 from base64 import b64encode, b64decode
 from User import User
+import urllib
 
 app = Flask(__name__)
 app.secret_key = 'secret-key'
+
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
@@ -14,6 +16,7 @@ def home():
     else:
         email = request.form['email']
         return email
+
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
@@ -28,6 +31,7 @@ def login():
             return redirect(url_for("welcome"))
         return render_template('login.html')
 
+
 @app.route('/logout')
 def logout():
     # session.pop("email", None)
@@ -35,18 +39,10 @@ def logout():
     response.delete_cookie("uid")
     return response
 
+
 @app.route('/register')
 def register():
     return render_template('register.html')
-
-@app.route("/index")
-def index():
-    search = request.args.get('search')
-
-    template = '''
-        {}
-    '''.format(search)
-    return render_template_string(template)
 
 
 @app.route('/welcome')
@@ -57,13 +53,15 @@ def welcome():
     else:
         return redirect(url_for("login"))
 
-# @app.route('/welcome')
-# def welcome():
-#     email = session["email"]
-#     if email:
-#         return render_template("welcome.html", email=email)
-#     else:
-#         return redirect(url_for("login"))
+
+@app.errorhandler(404)
+def page_not_found(error):
+    template = '''
+        <h1> Oops! This page doesn't exist! Error Code: 404</h1>
+        <h3>%s</h3>
+    ''' % (urllib.parse.unquote(request.url))
+
+    return render_template_string(template)
 
 
 if __name__ == '__main__':
